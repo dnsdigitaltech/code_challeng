@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content-title', 'Home')
-@section('content-subtitle', 'Raças/Breeds<')
+@section('content-subtitle', 'Raças/Breeds')
 
 @section('content')
 <div class="row">
@@ -22,7 +22,46 @@
             {{session('error')}}
         </div>
         @endif
-        You are logged in!
+        <table id="tableRequests" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="tableRequests">
+          <thead class="bg-primary">
+              <tr>
+                  <th>Id</th>
+                  <th>Raça</th>
+                  <th>Descrição</th>
+                  <th>Ver detalhes</th>
+              </tr>
+          </thead>
+          <tbody>
+        @forelse ($breeds as $breed)
+        <tr>
+          <td>{{$breed->id}}</td>  
+          <td>{{$breed->name}}</td> 
+          <td>{{$breed->description}}</td>   
+          <td><a href="" title="Ver Detalhe da raça - {{$breed->name}}"><i class="fa fa-search" aria-hidden="true"></i></a></td> 
+        </tr>   
+        @empty
+        <tr>
+          <td colspan="90">
+              <p>Nenhum Resultado!</p>
+          </td>
+        </tr>
+        @endforelse
+        <tbody>
+          <tfoot class="bg-primary">
+              <tr>
+                <tbody>
+                  <tfoot class="bg-primary">
+                      <tr>
+                        <th>Id</th>
+                        <th>Raça</th>
+                        <th>Descrição</th>
+                        <th>Ver detalhes</th>
+                      </tr>
+                  </tfoot>    
+              </table>
+              </tr>
+          </tfoot>    
+      </table>
       </div>
     </div>
   </div>
