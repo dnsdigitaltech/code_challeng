@@ -15,11 +15,11 @@
 
 @section('sidebar-menu')
 <ul class="sidebar-menu">
-  <li class="header">MAIN NAVIGATOR</li>
+  <li class="header">MENU</li>
   <li class="active">
     <a href="{{ route('home') }}">
       <i class="fa fa-home"></i>
-      <span>Home</span>
+      <span>Raças/breeds</span>
     </a>
   </li>
 </ul>
