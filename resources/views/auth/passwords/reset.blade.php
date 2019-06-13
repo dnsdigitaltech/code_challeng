@@ -8,7 +8,7 @@
 @endif
 
 <div class="login-box-body">
-  <p class="login-box-msg">Reset Password</p>
+  <p class="login-box-msg">Redefinição de senha</p>
 
   <form action="{{ route('password.request') }}" method="POST">
     {{ csrf_field() }}
@@ -21,19 +21,19 @@
       @endif
     </div>
     <div class="form-group has-feedback{{ $errors->has('password') ? ' has-error' : '' }}">
-      <input id="password" type="password" class="form-control" name="password" placeholder="Password" required>
+      <input id="password" type="password" class="form-control" name="password" placeholder="Senha" required>
       <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       @if ($errors->has('password'))
       <span class="help-block">{{ $errors->first('password') }}</span>
       @endif
     </div>
     <div class="form-group has-feedback{{ $errors->has('password_confirmation') ? ' has-error' : '' }}">
-      <input id="password-confirm" type="password" class="form-control" name="password_confirmation" placeholder="Retype Password" required>
+      <input id="password-confirm" type="password" class="form-control" name="password_confirmation" placeholder="Repetir Senha" required>
       <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
     </div>
     <div class="row">
       <div class="col-md-12">
-        <button type="submit" class="btn btn-primary btn-block btn-flat">Reset Password</button>
+        <button type="submit" class="btn btn-primary btn-block btn-flat">Redefinir Senha</button>
       </div>
       <!-- /.col -->
     </div>

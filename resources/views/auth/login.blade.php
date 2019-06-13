@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="login-box-body">
-  <p class="login-box-msg">Sign in to start your session</p>
+  <p class="login-box-msg">Entre para iniciar sua sessão</p>
 
   <form action="{{ route('login') }}" method="POST">
     {{ csrf_field() }}
@@ -14,39 +14,35 @@
       @endif
     </div>
     <div class="form-group has-feedback{{ $errors->has('password') ? ' has-error' : '' }}">
-      <input id="password" type="password" class="form-control" name="password" placeholder="Password" required>
+      <input id="password" type="password" class="form-control" name="password" placeholder="Senha" required>
       <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       @if ($errors->has('password'))
       <span class="help-block">{{ $errors->first('password') }}</span>
       @endif
     </div>
-    <div class="row">
+    <div class="row form-group has-feedback">
       <div class="col-xs-8">
-        <div class="checkbox icheck">
+        <div class="icheck">
           <label>
-            <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }} value="1"> Remember Me
+            <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }} value="1"> Lembrar
           </label>
         </div>
       </div>
       <!-- /.col -->
       <div class="col-xs-4">
-        <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+        <button type="submit" class="btn btn-primary btn-block btn-flat"> Entrar <span class="glyphicon glyphicon-log-in"></span></button>
       </div>
       <!-- /.col -->
     </div>
   </form>
-
-  {{-- <div class="social-auth-links text-center">
-    <p>- OR -</p>
-    <a href="#" class="btn btn-block btn-social btn-facebook btn-flat"><i class="fa fa-facebook"></i> Sign in using
-    Facebook</a>
-    <a href="#" class="btn btn-block btn-social btn-google btn-flat"><i class="fa fa-google-plus"></i> Sign in using
-    Google+</a>
+  <div class="row">
+    <div class="col-xs-8">
+          <a href="{{ route('password.request') }}">Esqueci minha senha <span class="glyphicon glyphicon-menu-right"></span></a> 
+    </div>
+    <!-- /.col -->
+    <div class="col-xs-4">
+      <a href="{{ route('register') }}" class="text-center">Cadastrar <span class="glyphicon glyphicon-plus-sign"></span></a>
+    </div>
   </div>
-  <!-- /.social-auth-links --> --}}
-
-  <a href="{{ route('password.request') }}">I forgot my password</a><br>
-  <a href="{{ route('register') }}" class="text-center">Register a new membership</a>
-
 </div>
 @endsection

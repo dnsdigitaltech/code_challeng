@@ -8,7 +8,7 @@
 @endif
 
 <div class="login-box-body">
-  <p class="login-box-msg">Reset Password</p>
+  <p class="login-box-msg">Redefinição de senha</p>
 
   <form action="{{ route('password.email') }}" method="POST">
     {{ csrf_field() }}
@@ -21,7 +21,8 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <button type="submit" class="btn btn-primary btn-block btn-flat">Send Password Reset Link</button>
+        <button type="submit" class="btn btn-primary btn-block btn-flat">Enviar o link de redefinição de senha</button>
+        <a href="{{ route('login') }}"><span class="glyphicon glyphicon-arrow-left" title="Voltar"></span></a>
       </div>
       <!-- /.col -->
     </div>
