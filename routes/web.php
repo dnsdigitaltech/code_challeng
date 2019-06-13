@@ -17,8 +17,12 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::group(['middleware' => ['auth']], function () {
 
-Auth::routes();
+    Route::fallback(function () {
+        return redirect()->route('home')->with('error', "☹ 404 - Esta página não foi encontrada");
+    });
 
-Route::get('/home', 'HomeController@index')->name('home');
+    Route::get('/home', 'BreedController@index')->name('home');
+});
+

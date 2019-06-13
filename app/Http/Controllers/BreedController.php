@@ -13,7 +13,7 @@ class BreedController extends Controller
      */
     public function index()
     {
-        //
+        return view('home');
     }
 
     /**
