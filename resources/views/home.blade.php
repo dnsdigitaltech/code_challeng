@@ -34,10 +34,14 @@
           <tbody>
         @forelse ($breeds as $breed)
         <tr>
-          <td>{{$breed->id}}</td>  
+          <td>{{$id_breed = $breed->id}}</td>  
           <td>{{$breed->name}}</td> 
           <td>{{$breed->description}}</td>   
-          <td><a href="" title="Ver Detalhe da raça - {{$breed->name}}"><i class="fa fa-search" aria-hidden="true"></i></a></td> 
+          
+          <td>
+            <a href="{{url("/buscar/$id_breed")}}" title="Ver Detalhe da raça - {{$breed->name}}">
+                <button class="btn"><i class="fa fa-search" aria-hidden="true"></i></a></button>
+            </a>
         </tr>   
         @empty
         <tr>

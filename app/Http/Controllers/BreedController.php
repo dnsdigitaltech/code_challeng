@@ -49,6 +49,46 @@ class BreedController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function search($id_breed)
+    {
+        
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://api.thecatapi.com/v1/images/search?breed_ids={$id_breed}",
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => false,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "GET",
+        CURLOPT_HTTPHEADER => array(
+            "Content-Type: application/json",
+            "x-api-key: d41b51ee-9016-4d12-bea3-20b5d60a9ceb"
+        ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err):
+            echo "cURL Error #:" . $err;
+        else:
+            $breed = json_decode($response);            
+        endif;
+
+        dd($breed);
+        
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function create()
     {
         //

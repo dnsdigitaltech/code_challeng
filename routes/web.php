@@ -24,5 +24,6 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     Route::get('/home', 'BreedController@index')->name('home');
+    Route::get('/buscar/{id_breed}', 'BreedController@search')->name('search');
 });
 
