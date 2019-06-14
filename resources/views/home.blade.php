@@ -39,9 +39,8 @@
           <td>{{$breed->description}}</td>   
           
           <td>
-            <a href="{{url("/buscar/$id_breed")}}" title="Ver Detalhe da raça - {{$breed->name}}">
-                <button class="btn"><i class="fa fa-search" aria-hidden="true"></i></a></button>
-            </a>
+            <button class="btn"><a href="{{url("/buscar/$id_breed")}}"  title="Ver Detalhe da raça - {{$breed->name}}"><i class="fa fa-search" aria-hidden="true"></i></a></button>
+          </td>
         </tr>   
         @empty
         <tr>
@@ -50,21 +49,15 @@
           </td>
         </tr>
         @endforelse
-        <tbody>
-          <tfoot class="bg-primary">
-              <tr>
-                <tbody>
-                  <tfoot class="bg-primary">
-                      <tr>
-                        <th>Id</th>
-                        <th>Raça</th>
-                        <th>Descrição</th>
-                        <th>Ver detalhes</th>
-                      </tr>
-                  </tfoot>    
-              </table>
-              </tr>
-          </tfoot>    
+      </tbody>         
+        <tfoot class="bg-primary">
+            <tr>
+              <th>Id</th>
+              <th>Raça</th>
+              <th>Descrição</th>
+              <th>Ver detalhes</th>
+            </tr>
+        </tfoot>     
       </table>
       </div>
     </div>
