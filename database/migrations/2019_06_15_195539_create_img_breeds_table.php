@@ -17,6 +17,7 @@ class CreateImgBreedsTable extends Migration
             $table->bigIncrements('id');
             $table->string('url', 200);
             $table->string('breed',12);
+            $table->tinyInteger('off')->default('1'); 
             $table->unsignedBigInteger('breed_id');
             $table->foreign('breed_id')->references('id')->on('breeds')->onDelete('cascade');
             $table->timestamps();

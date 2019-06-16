@@ -16,10 +16,22 @@
 @section('sidebar-menu')
 <ul class="sidebar-menu">
   <li class="header">MENU</li>
-  <li class="active">
+  <li class="{{ Request::is('home') ? 'active' : '' }}">
     <a href="{{ route('home') }}">
-      <i class="fa fa-home"></i>
-      <span>Raças/breeds</span>
+      <i class="fa fa-dashboard"></i>
+      <span>Dashboad</span>
+    </a>
+  </li>
+  <li class="{{ Request::is('breeds') ? 'active' : '' }}">
+    <a href="{{ route('breeds') }}">
+      <i class="fa fa-dashboard"></i>
+      <span>Acessar Breeds</span>
+    </a>
+  </li>
+  <li class="{{ Request::is('buscar/*') ? 'active' : '' }}">
+    <a href="{{ route('search.home') }}">
+      <i class="fa fa-dashboard"></i>
+      <span>Buscar Breeds</span>
     </a>
   </li>
 </ul>

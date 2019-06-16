@@ -34,7 +34,10 @@
           <tbody>
         @forelse ($breeds as $breed)
         <tr>
-          <td>{{$id_breed = $breed->id}}</td>  
+          <td>
+          @php isset($breed->off) ? $id_breed = $breed->id_breed : $id_breed = $breed->id @endphp
+          {{$id_breed}}
+          </td> 
           <td>{{$breed->name}}</td> 
           <td>{{$breed->description}}</td>   
           

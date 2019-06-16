@@ -52,6 +52,7 @@ class CreateBreedsTable extends Migration
             $table->tinyInteger('short_legs')->default('0'); 
             $table->string('wikipedia_url',200);
             $table->tinyInteger('hypoallergenic')->default('0');
+            $table->tinyInteger('off')->default('1'); 
             $table->timestamps();
         });
     }

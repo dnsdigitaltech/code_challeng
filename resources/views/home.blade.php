@@ -42,7 +42,9 @@
             {!!Form::close()!!} 
           </div>
           <div class="col-md-3">
-            <button type="button" class="btn btn-block btn-info btn-lg"><i class="fa fa-list-alt" aria-hidden="true"></i> Acessar Breeds</button>
+            {!!Form::open(['route' => 'breeds', 'class' => 'form form-search form-ds', 'method' => 'PUT'])!!}     
+              <button type="submit" class="btn btn-block btn-info btn-lg"><i class="fa fa-list-alt" aria-hidden="true"></i> Acessar Breeds</button>
+            {!!Form::close()!!} 
           </div>
           <div class="col-md-3">
             <button type="button" class="btn btn-block btn-primary btn-lg"><i class="fa fa-search" aria-hidden="true"></i> Buscar Breeds</button>
