@@ -24,6 +24,9 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     Route::get('/home', 'BreedController@index')->name('home');
+    Route::put('/baixar/breeds', 'BreedController@create')->name('create.breed');
+    Route::put('/baixar/fotos', 'ImgBreedController@create')->name('photos.breed');
+    //Route::get('/salvarimagem', 'ImgBreedController@photos')->name('photos');
     Route::get('/buscar/{id_breed}', 'BreedController@search')->name('search');
 });
 

@@ -158,7 +158,9 @@
             @if(isset($breed[0]->breeds[0]->vcahospitals_url))
             <p><a href="{{$breed[0]->breeds[0]->vcahospitals_url}}" class="btn btn-info" target="_blank">VCAHOSPITALS</a></p>
             @endif
+            @if(isset($breed[0]->breeds[0]->wikipedia_url))
             <p><a href="{{$breed[0]->breeds[0]->wikipedia_url}}" class="btn btn-info" target="_blank">WIKIPEDIA</a></p>
+            @endif
           </td>
         </tr>
            
