@@ -4,7 +4,13 @@
 @section('content-subtitle', 'Raças/Breeds')
 
 @section('content')
-@if(isset($breed->off)==1)
+@if (session('success'))
+<div class="alert alert-success">
+  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+  {{ session('success') }}
+</div>
+@endif  
+@if($status_db_api->on_off == 1)
 <div class="row">
   <div class="col-md-12">
     <div class="box box-primary">
@@ -36,7 +42,7 @@
   <div class="col-md-12">
     <div class="box box-primary">
       <div class="box-header">
-        <h3 class="box-title">BUscar por Raça/Breed</h3>
+        <h3 class="box-title">Buscar por Raça/Breed</h3>
       </div>
       <div class="box-body">
         <table align="center" width="418">  
@@ -55,7 +61,7 @@
           </td>
         </tr>     
         <tr>
-          <td>Escolha Raça/Breed e faça sua busca!</td>  
+          <td><center><h4>Escolha Raça/Breed e faça sua busca!</h4></center></td>  
         </tr>
         <tr>
           <td></td> 

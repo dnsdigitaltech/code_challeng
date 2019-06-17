@@ -10,6 +10,12 @@
       <div class="box-header">
         <h3 class="box-title">Raças/Breeds</h3>
       </div>
+      @if (session('success'))
+        <div class="alert alert-success">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+          {{ session('success') }}
+        </div>
+        @endif  
       <div class="box-body">
         @if (session('status'))
         <div class="alert alert-success">

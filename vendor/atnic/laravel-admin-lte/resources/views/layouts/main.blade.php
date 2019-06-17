@@ -26,8 +26,6 @@
   <![endif]-->
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <!-- Bootstrap 3.3.7 -->
-    <link href="{{ url('/adminlte/bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="{{ url('/adminlte/bower_components/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
     <!-- Ionicons -->
@@ -56,7 +54,7 @@
   @stack('head')
 </head>
 
-<body class="hold-transition skin-{{ config('admin-lte.skin', 'blue') }} {{ config('admin-lte.layout', 'sidebar-mini') }}">
+<body class="hold-transition fixed skin-{{ config('admin-lte.skin', 'blue') }} {{ config('admin-lte.layout', 'sidebar-mini') }}">
   <div id="app" class="wrapper">
 
     <!-- Main Header -->
@@ -79,8 +77,7 @@
   <script src="{{ mix('/js/admin-lte.js') }}" charset="utf-8"></script>
   <!-- jQuery 3 -->
   <script src="{{ url('/adminlte/bower_components/jquery/dist/jquery.min.js') }}" ></script>
-  <!-- Bootstrap 3.3.7 -->
-  <script src="{{ url('/adminlte/bower_components/bootstrap/dist/js/bootstrap.min.js') }}" ></script>
+  
   <!-- Select2 -->
   <script src="{{ url('/adminlte/bower_components/select2/dist/js/select2.full.min.js') }}" ></script>
   <!-- InputMask -->

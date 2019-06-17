@@ -34,5 +34,29 @@
       <span>Buscar Breeds</span>
     </a>
   </li>
+  <li class="header">API/DB</li>
+  @if ($status_db_api->on_off == 1)
+  <li class="">
+    <a href="{{ route('status.db') }}">      
+      <span>
+        <i class="fa fa-cloud" aria-hidden="true"></i>API
+        <img src="{{asset('images/right.png')}}">
+        <i class="fa fa-database" aria-hidden="true"></i>DB
+      </span>
+    </a>
+  </li>
+  @else
+  <li class="">
+    <a href="{{ route('status.api') }}" >        
+      <span>
+        <i class="fa fa-cloud" aria-hidden="true"></i>API
+        <img src="{{asset('images/left.png')}}">
+        <i class="fa fa-database" aria-hidden="true"></i>DB
+      </span>
+    </a>
+  </li>
+  @endif
+
+  
 </ul>
 @endsection

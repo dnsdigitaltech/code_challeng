@@ -12,7 +12,12 @@
         <h3 class="box-title">Raça/Breed - {{$breed->name}}</h3>
       </div>
       <div class="box-body">
-           
+        @if (session('success'))
+        <div class="alert alert-success">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+          {{ session('success') }}
+        </div>
+        @endif  
         <table align="center" width="418">      
         <tr>
           <td>

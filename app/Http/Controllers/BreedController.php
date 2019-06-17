@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Breed;
-use Illuminate\Support\Facades\Storage;
 use App\Models\ImgBreed;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use DB;
 
 class BreedController extends Controller
@@ -13,12 +13,13 @@ class BreedController extends Controller
 
     private $breed, $imgbreed;
     /*
-    * Construtor da classe
-    * @access public
-    * @subpackage Breed 
-    * @param String $breed
-    * @return void
-    */
+     * Construtor da classe
+     * @access public
+     * @subpackage Breed
+     * @subpackage ImgBreed
+     * @param String $breed
+     * @return void
+     */
     public function __construct(Breed $breed, ImgBreed $imgbreed)
     {
         $this->breed = $breed;
@@ -26,24 +27,31 @@ class BreedController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * pagina dashboard.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-       return view('home', compact('breeds'));
+        //Exibir o menu BD/API Habilitado
+        $status_db_api = DB::table('status')->first();
+        return view('home', compact('breeds', 'status_db_api'));
     }
+
+    /**
+     * Ler API Breends e salva no DB
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function breeds()
     {
-        /////////////////////////LENDO TODAS AS RAÇAS DOS GATOS////////////// 
-        $breeds = $this->breed->where('off', '1')->first();    
-        //verifica se esta on/off
-        if(isset($breeds)==true):
-            $url = "";  
+        //verifica se o sistema esta BD/API Habilitado
+        $status = DB::table('status')->where('on_off', '1')->first();
+        if (isset($status) == true):
+            $url = "";
         else:
-            $url ="https://api.thecatapi.com/v1/breeds";
-        endif; 
+            $url = "https://api.thecatapi.com/v1/breeds";
+        endif;
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => "$url",
@@ -66,16 +74,17 @@ class BreedController extends Controller
         curl_close($curl);
 
         if ($err):
-            $breeds = $this->breed->get(); 
+            //Se $status true a url API não existe o sistema consultará off no db
+            $breeds = $this->breed->get();
         else:
             $breeds = json_decode($response);
-            ////////////PREPARANDO A RAÇA DO GRATO PARA SALVAR NO DB//////////////
-            foreach($breeds as $breed):
-                //VERIFICANDO SE o breend  TAl JA FOI baixado/////////
-                $date['img']= $this->breed->where('id_breed', $breed->id)->first();    
-                //dd($date['img'] == false);  
-                if($date['img'] == false ){ 
-                    $data['id_breed'] = $breed->id;                                    
+            //Preparando a raça/breed para salvar no db
+            foreach ($breeds as $breed):
+                //Verificando se a raça/breed ja está salva no db
+                $date['img'] = $this->breed->where('id_breed', $breed->id)->first();  
+                //Verifica se a raça/breed nã esiste na base, caso (false) encapsula os dados e salva              
+                if ($date['img'] == false) {
+                    $data['id_breed'] = $breed->id;
                     $data['name'] = $breed->name;
                     $data['weight_imperial'] = $breed->weight->imperial;
                     $data['weight_metric'] = $breed->weight->metric;
@@ -111,33 +120,35 @@ class BreedController extends Controller
                     $data['suppressed_tail'] = $breed->suppressed_tail;
                     $data['short_legs'] = $breed->short_legs;
                     $data['wikipedia_url'] = isset($breed->wikipedia_url) ? $breed->wikipedia_url : '';
-                    ////////////SALVANDO A RAÇA DO GATO NA TABELA//////////////
-                    $insert = $this->breed->create($data); 
+                    //Salvando a raça/breed no db
+                    $insert = $this->breed->create($data);
                 }
-
             endforeach;
         endif;
-        return view('breeds', compact('breeds'));
+        //Exibir o menu BD/API Habilitado
+        $status_db_api = DB::table('status')->first();
+        return view('breeds', compact('breeds','status_db_api'));
     }
-    
 
     /**
-     * Show the form for creating a new resource.
+     * Buscar a imagem da raça/breed para mostrar o detalhe
      *
+     * @param  int  $id_breed
+     * 
      * @return \Illuminate\Http\Response
      */
     public function search($id_breed)
     {
-        $breed = $this->breed->where('off', '1')->where('id_breed', $id_breed)->first();  
+        //verifica se o sistema esta BD/API Habilitado
+        $status = DB::table('status')->where('on_off', '1')->first();
         
-        //verifica se esta on/off
-        if(isset($breed)==true):
-            $url = "";  
+        if (isset($status) == true):
+            $url = "";
         else:
-            $url = "https://api.thecatapi.com/v1/images/search?breed_ids={$breed->id_breed}";
+            $url = "https://api.thecatapi.com/v1/images/search?breed_ids={$id_breed}";
         endif;
         $curl = curl_init();
-        
+
         curl_setopt_array($curl, array(
             CURLOPT_URL => "$url",
             CURLOPT_RETURNTRANSFER => true,
@@ -160,55 +171,63 @@ class BreedController extends Controller
 
         if ($err):
             //verificar de imagem existe na base e pegar a mesma
-            $img = $this->imgbreed->where('breed', $breed->id_breed)->first(); 
-            
-                //verifica se a imagem esta salva no db   
-                if(isset($img) == false):
-                    $url = ("https://api.thecatapi.com/v1/images/search?breed_ids={$breed->id_breed}");
-                    $curl = curl_init();               
-                    curl_setopt_array($curl, array(
-                        CURLOPT_URL => "$url",
-                        CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_ENCODING => "",
-                        CURLOPT_MAXREDIRS => 10,
-                        CURLOPT_TIMEOUT => 0,
-                        CURLOPT_FOLLOWLOCATION => false,
-                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                        CURLOPT_CUSTOMREQUEST => "GET",
-                        CURLOPT_HTTPHEADER => array(
-                            "Content-Type: application/json",
-                            "x-api-key: d41b51ee-9016-4d12-bea3-20b5d60a9ceb",
-                        ),
-                    ));
+            $img = $this->imgbreed->where('breed', $id_breed)->first();
+            //verifica se a imagem não existe no db
+            if (isset($img) == false):
+                $url = ("https://api.thecatapi.com/v1/images/search?breed_ids={$id_breed}");
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => "$url",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => false,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "GET",
+                    CURLOPT_HTTPHEADER => array(
+                        "Content-Type: application/json",
+                        "x-api-key: d41b51ee-9016-4d12-bea3-20b5d60a9ceb",
+                    ),
+                ));
 
-                    $response = curl_exec($curl);
-                    $err = curl_error($curl);
+                $response = curl_exec($curl);
+                $err = curl_error($curl);
 
-                    curl_close($curl);
-
-                    if ($err):
-                        return redirect()->route('home')->with('error', "OOOPPPSSS! Não é possível baixar as fotos os breeds, pois o servidor está off-line, possivelmente você desativou o mesmo!");
-                    else:
-                        $imgbreed = json_decode($response);
-                    
-                        /////efetuando download da imagem e salvando no local////
-
-                        $url = $imgbreed[0]->url;
-                        $contents = file_get_contents($url);
-                        $name = $breed['id_breed'].'-'.substr($url, strrpos($url, '/') + 1);
-                        Storage::put($name, $contents);
-                        //////salvando no banco a url da imagem/////
-                        $data['url'] = $name;
-                        $data['breed'] = $breed->id_breed;
-                        $data['breed_id'] = $breed->id;
-                        $insert = $this->imgbreed->create($data);
-                    endif;
+                curl_close($curl);
+                if ($err):
+                    return redirect()->route('home')->with('error', "OOOPPPSSS! Não é possível baixar as fotos dos breeds, pois o servidor está off-line, possivelmente você desativou o mesmo!");
                 else:
-                    $breeds = $this->breed->pluck('name', 'id_breed'); 
-                    //dd($breeds);
-                    $breed = $this->breed->where('id_breed', $id_breed)->first();   
-                    return view('search', compact('breed', 'img', 'breeds'));  
-                endif;        
+                    $imgbreed = json_decode($response);
+                    //Efetuando download da imagem e salvando no local
+                    $url = $imgbreed[0]->url;
+                    $contents = file_get_contents($url);
+                    $name = $id_breed . '-' . substr($url, strrpos($url, '/') + 1);
+                    Storage::put($name, $contents);
+                    //Seleciona o breed específico e buscar o id breed para salvar na FK migration img_breed
+                    $breed = $this->breed->where('id_breed', $id_breed)->first();
+                    //salvando no banco a url da imagem
+                    $data['url'] = $name;
+                    $data['breed'] = $id_breed;
+                    $data['breed_id'] = $breed->id;
+                    $insert = $this->imgbreed->create($data);
+                    //Exibir os breeds no select acima da imagem
+                    $breeds = $this->breed->pluck('name', 'id_breed');
+                    //pega a url img depois que salvou na base
+                    $img = $this->imgbreed->where('breed', $id_breed)->first();
+                    //Exibir o menu BD/API Habilitado
+                    $status_db_api = DB::table('status')->first();
+                    return view('search', compact('breed', 'img', 'breeds', 'status_db_api'));
+                endif;
+            else:
+                //Seleciona os breeds para pupular o select acima da imagem
+                $breeds = $this->breed->pluck('name', 'id_breed');
+                //Seleciona o breed específico
+                $breed = $this->breed->where('id_breed', $id_breed)->first();
+                //Exibir o menu BD/API Habilitado
+                $status_db_api = DB::table('status')->first();
+                return view('search', compact('breed', 'img', 'breeds', 'status_db_api'));
+            endif;
         else:
             $curl = curl_init();
             $url = "https://api.thecatapi.com/v1/breeds";
@@ -228,23 +247,39 @@ class BreedController extends Controller
             ));
 
             $response_on = curl_exec($curl);
-            $err = curl_error($curl); 
+            $err = curl_error($curl);
             curl_close($curl);
-
+            //Traz os breeds para pulupar o select acima da imagem 
             $breeds = json_decode($response_on);
-            //dd($breeds);
-            $breed = json_decode($response);      
-            return view('search', compact('breed', 'breeds')); 
+            //Traz o breed específico
+            $breed = json_decode($response);
+            //Exibir o menu BD/API Habilitado
+            $status_db_api = DB::table('status')->first();
+            return view('search', compact('breed', 'breeds','status_db_api'));
         endif;
 
     }
 
+    /**
+     * Buscar a imagem da raça/breed para mostrar o detalhe
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function searchTwo(Request $request)
     {
+        //Pegar o id_breed via Request
         $id_breed = $request->id_breed;
-        $breed = $this->breed->where('off', '1')->where('id_breed', $id_breed)->first(); 
+        //Verifica se o sistema esta BD/API Habilitado
+        $status = DB::table('status')->where('on_off', '1')->first();        
+        if (isset($status) == true):
+            $url = "";
+        else:
+            $url = "https://api.thecatapi.com/v1/images/search?breed_ids={$id_breed}";
+        endif;
         $curl = curl_init();
-        $url = "https://api.thecatapi.com/v1/images/search?breed_ids={$id_breed}";
+        $url = "$url";
         curl_setopt_array($curl, array(
             CURLOPT_URL => "",
             CURLOPT_RETURNTRANSFER => true,
@@ -266,56 +301,67 @@ class BreedController extends Controller
         curl_close($curl);
 
         if ($err):
-            //verificar de imagem existe na base e pegar a mesma
-            $img = $this->imgbreed->where('breed', $breed->id_breed)->first(); 
-            
-                //verifica se a imagem esta salva no db   
-                if(isset($img) == false):
-                    $url = ("https://api.thecatapi.com/v1/images/search?breed_ids={$breed->id_breed}");
-                    $curl = curl_init();               
-                    curl_setopt_array($curl, array(
-                        CURLOPT_URL => "$url",
-                        CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_ENCODING => "",
-                        CURLOPT_MAXREDIRS => 10,
-                        CURLOPT_TIMEOUT => 0,
-                        CURLOPT_FOLLOWLOCATION => false,
-                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                        CURLOPT_CUSTOMREQUEST => "GET",
-                        CURLOPT_HTTPHEADER => array(
-                            "Content-Type: application/json",
-                            "x-api-key: d41b51ee-9016-4d12-bea3-20b5d60a9ceb",
-                        ),
-                    ));
+            //Verificar de imagem existe na base e pegar a mesma
+            $img = $this->imgbreed->where('breed', $id_breed)->first();
 
-                    $response = curl_exec($curl);
-                    $err = curl_error($curl);
+            //Verifica se a imagem esta salva no db
+            if (isset($img) == false):
+                $url = ("https://api.thecatapi.com/v1/images/search?breed_ids={$id_breed}");
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => "$url",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => false,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "GET",
+                    CURLOPT_HTTPHEADER => array(
+                        "Content-Type: application/json",
+                        "x-api-key: d41b51ee-9016-4d12-bea3-20b5d60a9ceb",
+                    ),
+                ));
 
-                    curl_close($curl);
+                $response = curl_exec($curl);
+                $err = curl_error($curl);
 
-                    if ($err):
-                        return redirect()->route('home')->with('error', "OOOPPPSSS! Não é possível baixar as fotos os breeds, pois o servidor está off-line, possivelmente você desativou o mesmo!");
-                    else:
-                        $imgbreed = json_decode($response);
-                    
-                        /////efetuando download da imagem e salvando no local////
+                curl_close($curl);
 
-                        $url = $imgbreed[0]->url;
-                        $contents = file_get_contents($url);
-                        $name = $breed['id_breed'].'-'.substr($url, strrpos($url, '/') + 1);
-                        Storage::put($name, $contents);
-                        //////salvando no banco a url da imagem/////
-                        $data['url'] = $name;
-                        $data['breed'] = $breed->id_breed;
-                        $data['breed_id'] = $breed->id;
-                        $insert = $this->imgbreed->create($data);
-                    endif;
+                if ($err):
+                    return redirect()->route('home')->with('error', "OOOPPPSSS! Não é possível baixar as fotos os breeds, pois o servidor está off-line, possivelmente você desativou o mesmo!");
                 else:
-                    $breeds = $this->breed->pluck('name', 'id_breed'); 
-                    //dd($breeds);
-                    $breed = $this->breed->where('id_breed', $id_breed)->first();   
-                    return view('search', compact('breed', 'img', 'breeds'));  
-                endif; 
+                    $imgbreed = json_decode($response);
+
+                    //Efetuando download da imagem e salvando no local
+                    $url = $imgbreed[0]->url;
+                    $contents = file_get_contents($url);
+                    $name = $id_breed . '-' . substr($url, strrpos($url, '/') + 1);
+                    Storage::put($name, $contents);
+                    //Seleciona o breed específico e buscar o id breed para salvar na FK migration img_breed
+                    $breed = $this->breed->where('id_breed', $id_breed)->first();
+                    //Salvando no banco a url da imagem
+                    $data['url'] = $name;
+                    $data['breed'] = $id_breed;
+                    $data['breed_id'] = $breed->id;
+                    $insert = $this->imgbreed->create($data);
+                    //Exibir os breeds no select acima da imagem
+                    $breeds = $this->breed->pluck('name', 'id_breed');
+                    //pega a url img depois que salvou na base
+                    $img = $this->imgbreed->where('breed', $id_breed)->first();
+                    //Exibir o menu BD/API Habilitado
+                    $status_db_api = DB::table('status')->first();
+                    return view('search', compact('breed', 'img', 'breeds', 'status_db_api'));
+                endif;
+            else:
+                //Seleciona os breeds para pupular o select acima da imagem
+                $breeds = $this->breed->pluck('name', 'id_breed');
+                //Seleciona o breed específico
+                $breed = $this->breed->where('id_breed', $id_breed)->first();
+                //Exibir o menu BD/API Habilitado
+                $status_db_api = DB::table('status')->first();
+                return view('search', compact('breed', 'img', 'breeds', 'status_db_api'));
+            endif;
         else:
             $curl = curl_init();
             $url = "https://api.thecatapi.com/v1/breeds";
@@ -335,50 +381,67 @@ class BreedController extends Controller
             ));
 
             $response_on = curl_exec($curl);
-            $err = curl_error($curl); 
+            $err = curl_error($curl);
             curl_close($curl);
-
+            //Traz os breeds para pulupar o select acima da imagem 
             $breeds = json_decode($response_on);
-            //dd($breeds);
-            $breed = json_decode($response);             
-            return view('search', compact('breed', 'breeds')); 
+            //Traz o breed específico
+            $breed = json_decode($response);
+            //Exibir o menu BD/API Habilitado
+            $status_db_api = DB::table('status')->first();
+            return view('search', compact('breed', 'breeds', 'status_db_api'));
         endif;
 
     }
 
+    /**
+     * pagina buscar sem parâmentros
+     * 
+     * @return \Illuminate\Http\Response
+     */
+
     public function searchHome()
     {
-            $curl = curl_init();
+        //Verifica se o sistema esta BD/API Habilitado
+        $status = DB::table('status')->where('on_off', '1')->first();  
+        if (isset($status) == true):
+            $url = "";
+        else:
             $url = "https://api.thecatapi.com/v1/breeds";
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "$url",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "$url",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => false,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "GET",
-                CURLOPT_HTTPHEADER => array(
-                    "Content-Type: application/json",
-                    "x-api-key: d41b51ee-9016-4d12-bea3-20b5d60a9ceb",
-                ),
-            ));
-            $response = curl_exec($curl);
-            $err = curl_error($curl);
+        endif;
+        $curl = curl_init();
+        $url = "$url";
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "$url",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "$url",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "Content-Type: application/json",
+                "x-api-key: d41b51ee-9016-4d12-bea3-20b5d60a9ceb",
+            ),
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
 
-            curl_close($curl);
-
-            if ($err):
-                $breeds = $this->breed->pluck('name', 'id_breed'); 
-                //dd($breeds); 
-                //dd($breed->name);
-                return view('home_search', compact('breed', 'img', 'breeds'));
-            else:   
-                $breeds = json_decode($response);
-                //dd($breeds);      
-                return view('home_search', compact('breed', 'breeds')); 
-            endif;
+        curl_close($curl);
+        if ($err):
+            //Exibir os breeds no select acima da imagem
+            $breeds = $this->breed->pluck('name', 'id_breed');
+            //Exibir o menu BD/API Habilitado
+            $status_db_api = DB::table('status')->first();
+            return view('home_search', compact('img', 'breeds', 'status_db_api'));
+        else:
+            //Traz o breed específico
+            $breeds = json_decode($response);
+            //Exibir o menu BD/API Habilitado
+            $status_db_api = DB::table('status')->first();
+            return view('home_search', compact('breeds','status_db_api'));
+        endif;
 
     }
 
@@ -389,11 +452,15 @@ class BreedController extends Controller
      */
     public function create()
     {
-        /////////////////////////LENDO TODAS AS RAÇAS DOS GATOS//////////////
+        //verifica se o sistema esta BD/API Habilitado
+        $status = DB::table('status')->where('on_off', '1')->first();
+        if (isset($status) == true):
+            $url = "";
+        else:
+            $url = "https://api.thecatapi.com/v1/breeds";
+        endif;
         $curl = curl_init();
-
-        $url = 'https://api.thecatapi.com/v1/breeds';
-
+        $url = "$url";
         curl_setopt_array($curl, array(
             CURLOPT_URL => "$url",
             CURLOPT_RETURNTRANSFER => true,
@@ -411,21 +478,18 @@ class BreedController extends Controller
 
         $response = curl_exec($curl);
         $err = curl_error($curl);
-
         curl_close($curl);
-
         if ($err):
             return redirect()->route('home')->with('error', "OOOPPPSSS! Não é possível baixar os breeds, pois o servidor está off-line, possivelmente você desativou o mesmo!");
         else:
             $breeds = json_decode($response);
-
-            ////////////PREPARANDO A RAÇA DO GRATO PARA SALVAR NO DB//////////////
-            foreach($breeds as $breed):
-                //VERIFICANDO SE o breend  TAl JA FOI baixado/////////
-                $date['breed']= $this->breed->where('id_breed', $breed->id)->first();    
-                //dd($date['img'] == false);  
-                if($date['breed'] == false ){ 
-                    $data['id_breed'] = $breed->id;                                    
+            //preparando para salvar os breeds no bd
+            foreach ($breeds as $breed):
+                //verificando se o breed já está salvo bd
+                $date['breed'] = $this->breed->where('id_breed', $breed->id)->first();
+                //caso o bred não está no banco ele salva
+                if ($date['breed'] == false) {
+                    $data['id_breed'] = $breed->id;
                     $data['name'] = $breed->name;
                     $data['weight_imperial'] = $breed->weight->imperial;
                     $data['weight_metric'] = $breed->weight->metric;
@@ -461,68 +525,32 @@ class BreedController extends Controller
                     $data['suppressed_tail'] = $breed->suppressed_tail;
                     $data['short_legs'] = $breed->short_legs;
                     $data['wikipedia_url'] = isset($breed->wikipedia_url) ? $breed->wikipedia_url : '';
-                    ////////////SALVANDO A RAÇA DO GATO NA TABELA//////////////
-                    $insert = $this->breed->create($data); 
+                    //salvando os breeds no bd
+                    $insert = $this->breed->create($data);
                 }
 
-            endforeach; 
-            return redirect()->route('home')->with('success', "Os Breeds foram cadastrados com sussesso, agora você acessará off-line!");
+            endforeach;
+            return redirect()->route('home')->with('success', "Os Breeds foram cadastrados com sucesso, agora você acessará off-line!");
         endif;
     }
 
     /**
-     * Store a newly created resource in storage.
+     * BD/API Habilita/Desabilita.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function status(Request $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+         //Habilitar o sistema para BD/API
+         $status = DB::table('status')->where('on_off', '0')->first();
+         if ($status == true):
+            //Insere 1 para o campo on_off da tabela status (BD)
+             DB::table('status')->update(['on_off' => 1]);
+             return redirect()->back()->with('success', "Banco de Dados foi habilitado");
+         else:
+             //Insere 0 para o campo on_off da tabela status (API)
+             DB::table('status')->update(['on_off' => 0]);
+             return redirect()->back()->with('success', "API foi habilitada");
+         endif;
     }
 }

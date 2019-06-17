@@ -30,5 +30,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::any('/buscar/home', 'BreedController@searchHome')->name('search.home');
     Route::post('/buscar/', 'BreedController@searchTwo')->name('searchTwo');
     Route::get('/buscar/{id_breed}', 'BreedController@search')->name('search');
+    Route::get('/db-habilitado', 'BreedController@status')->name('status.db');
+    Route::get('/api-habilitado', 'BreedController@status')->name('status.api');
 });
 
