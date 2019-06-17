@@ -36,9 +36,15 @@ class BreedController extends Controller
     }
     public function breeds()
     {
-        /////////////////////////LENDO TODAS AS RAÇAS DOS GATOS//////////////        
+        /////////////////////////LENDO TODAS AS RAÇAS DOS GATOS////////////// 
+        $breeds = $this->breed->where('off', '1')->first();    
+        //verifica se esta on/off
+        if(isset($breeds)==true):
+            $url = "";  
+        else:
+            $url ="https://api.thecatapi.com/v1/breeds";
+        endif; 
         $curl = curl_init();
-        $url = "https://api.thecatapi.com/v1/breeds";
         curl_setopt_array($curl, array(
             CURLOPT_URL => "$url",
             CURLOPT_RETURNTRANSFER => true,
@@ -122,8 +128,16 @@ class BreedController extends Controller
      */
     public function search($id_breed)
     {
+        $breed = $this->breed->where('off', '1')->where('id_breed', $id_breed)->first();  
+        
+        //verifica se esta on/off
+        if(isset($breed)==true):
+            $url = "";  
+        else:
+            $url = "https://api.thecatapi.com/v1/images/search?breed_ids={$breed->id_breed}";
+        endif;
         $curl = curl_init();
-        $url = "https://api.thecatapi.com/v1/images/search?breed_ids={$id_breed}";
+        
         curl_setopt_array($curl, array(
             CURLOPT_URL => "$url",
             CURLOPT_RETURNTRANSFER => true,
@@ -146,14 +160,55 @@ class BreedController extends Controller
 
         if ($err):
             //verificar de imagem existe na base e pegar a mesma
-            $img = $this->imgbreed->where('breed', $id_breed)->first(); 
-            if($img == false ){ 
-            return redirect()->route('home')->with('error', "OOOPPPSSS! Você está usando o modo off-line é recomendado baixar a imagem deste breed, para fazer este procedimento habilite o modo API!");
-            }
-            $breeds = $this->breed->pluck('name', 'id_breed'); 
-            //dd($breeds);
-            $breed = $this->breed->where('id_breed', $id_breed)->first();   
-            return view('search', compact('breed', 'img', 'breeds'));          
+            $img = $this->imgbreed->where('breed', $breed->id_breed)->first(); 
+            
+                //verifica se a imagem esta salva no db   
+                if(isset($img) == false):
+                    $url = ("https://api.thecatapi.com/v1/images/search?breed_ids={$breed->id_breed}");
+                    $curl = curl_init();               
+                    curl_setopt_array($curl, array(
+                        CURLOPT_URL => "$url",
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => "",
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => false,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => "GET",
+                        CURLOPT_HTTPHEADER => array(
+                            "Content-Type: application/json",
+                            "x-api-key: d41b51ee-9016-4d12-bea3-20b5d60a9ceb",
+                        ),
+                    ));
+
+                    $response = curl_exec($curl);
+                    $err = curl_error($curl);
+
+                    curl_close($curl);
+
+                    if ($err):
+                        return redirect()->route('home')->with('error', "OOOPPPSSS! Não é possível baixar as fotos os breeds, pois o servidor está off-line, possivelmente você desativou o mesmo!");
+                    else:
+                        $imgbreed = json_decode($response);
+                    
+                        /////efetuando download da imagem e salvando no local////
+
+                        $url = $imgbreed[0]->url;
+                        $contents = file_get_contents($url);
+                        $name = $breed['id_breed'].'-'.substr($url, strrpos($url, '/') + 1);
+                        Storage::put($name, $contents);
+                        //////salvando no banco a url da imagem/////
+                        $data['url'] = $name;
+                        $data['breed'] = $breed->id_breed;
+                        $data['breed_id'] = $breed->id;
+                        $insert = $this->imgbreed->create($data);
+                    endif;
+                else:
+                    $breeds = $this->breed->pluck('name', 'id_breed'); 
+                    //dd($breeds);
+                    $breed = $this->breed->where('id_breed', $id_breed)->first();   
+                    return view('search', compact('breed', 'img', 'breeds'));  
+                endif;        
         else:
             $curl = curl_init();
             $url = "https://api.thecatapi.com/v1/breeds";
@@ -187,6 +242,7 @@ class BreedController extends Controller
     public function searchTwo(Request $request)
     {
         $id_breed = $request->id_breed;
+        $breed = $this->breed->where('off', '1')->where('id_breed', $id_breed)->first(); 
         $curl = curl_init();
         $url = "https://api.thecatapi.com/v1/images/search?breed_ids={$id_breed}";
         curl_setopt_array($curl, array(
@@ -211,15 +267,55 @@ class BreedController extends Controller
 
         if ($err):
             //verificar de imagem existe na base e pegar a mesma
-            $img = $this->imgbreed->where('breed', $id_breed)->first(); 
-            if($img == false ){ 
-            return redirect()->route('home')->with('error', "OOOPPPSSS! Você está usando o modo off-line é recomendado baixar a imagem deste breed, para fazer este procedimento habilite o modo API!");
-            }
-            $breeds = $this->breed->pluck('name', 'id_breed'); 
-            //dd($breeds);
-            $breed = $this->breed->where('id_breed', $id_breed)->first(); 
-            //dd($breed->name);
-            return view('search', compact('breed', 'img', 'breeds'));
+            $img = $this->imgbreed->where('breed', $breed->id_breed)->first(); 
+            
+                //verifica se a imagem esta salva no db   
+                if(isset($img) == false):
+                    $url = ("https://api.thecatapi.com/v1/images/search?breed_ids={$breed->id_breed}");
+                    $curl = curl_init();               
+                    curl_setopt_array($curl, array(
+                        CURLOPT_URL => "$url",
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => "",
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => false,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => "GET",
+                        CURLOPT_HTTPHEADER => array(
+                            "Content-Type: application/json",
+                            "x-api-key: d41b51ee-9016-4d12-bea3-20b5d60a9ceb",
+                        ),
+                    ));
+
+                    $response = curl_exec($curl);
+                    $err = curl_error($curl);
+
+                    curl_close($curl);
+
+                    if ($err):
+                        return redirect()->route('home')->with('error', "OOOPPPSSS! Não é possível baixar as fotos os breeds, pois o servidor está off-line, possivelmente você desativou o mesmo!");
+                    else:
+                        $imgbreed = json_decode($response);
+                    
+                        /////efetuando download da imagem e salvando no local////
+
+                        $url = $imgbreed[0]->url;
+                        $contents = file_get_contents($url);
+                        $name = $breed['id_breed'].'-'.substr($url, strrpos($url, '/') + 1);
+                        Storage::put($name, $contents);
+                        //////salvando no banco a url da imagem/////
+                        $data['url'] = $name;
+                        $data['breed'] = $breed->id_breed;
+                        $data['breed_id'] = $breed->id;
+                        $insert = $this->imgbreed->create($data);
+                    endif;
+                else:
+                    $breeds = $this->breed->pluck('name', 'id_breed'); 
+                    //dd($breeds);
+                    $breed = $this->breed->where('id_breed', $id_breed)->first();   
+                    return view('search', compact('breed', 'img', 'breeds'));  
+                endif; 
         else:
             $curl = curl_init();
             $url = "https://api.thecatapi.com/v1/breeds";
