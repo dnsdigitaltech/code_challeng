@@ -19,18 +19,18 @@
   <li class="{{ Request::is('home') ? 'active' : '' }}">
     <a href="{{ route('home') }}">
       <i class="fa fa-dashboard"></i>
-      <span>Dashboad</span>
+      <span>Dashboard</span>
     </a>
   </li>
   <li class="{{ Request::is('breeds') ? 'active' : '' }}">
     <a href="{{ route('breeds') }}">
-      <i class="fa fa-dashboard"></i>
+      <i class="fa fa-th-large" aria-hidden="true"></i>
       <span>Acessar Breeds</span>
     </a>
   </li>
-  <li class="{{ Request::is('buscar/*') ? 'active' : '' }}">
+  <li class="{{ Request::is('buscar*') ? 'active' : '' }}">
     <a href="{{ route('search.home') }}">
-      <i class="fa fa-dashboard"></i>
+      <i class="fa fa-search" aria-hidden="true"></i>
       <span>Buscar Breeds</span>
     </a>
   </li>
