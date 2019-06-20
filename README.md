@@ -14,4 +14,4 @@
 #### Acessando o sistema
 * Para acessar o sistema basta digitar `http://localhost:8000/` no navegador, irá aparecer uma tela de login e senha, se for seu primeiro acesso clique em cadastrar;
 
-### Para mais informações como usar o sistema [clique aqui](http://www.dnsdigitaltech.com.br/docs.pdf)
+### Para mais informações como usar o sistema [clique aqui](https://drive.google.com/file/d/1Ij9-r5J9q-UdTkzgoGmbuiB6ifIcSEKd/view)
