@@ -8,6 +8,8 @@
 * Após atualizar o composer, renomeie o arquivo `example.env` para `.env`. Crie sua base de dados, exemplo: `CREATE DATABASE db_name COLLATE utf8mb4_unicode_ci`, configure seu banco de dados no .env;
 #### Instalando as Migrations
 * No terminal do seu projeto execute o comando `php artisan migrate:fresh`, todas as tabelas serão criadas;
+#### Compatilhamento de imagens no diretório storage para public
+* No terminal do seu projeto execute o comando `php artisan storage:link`, para usar as imagens que serão baixadas em seu projeto, coloque o diretório storage para 775 ou 777, ex: `sudo chmod 777 -R storage` ou `sudo chmod 775 -R storage` 
 #### Executando o servidor
 * Para executar o servidor ainda no terminal digite o comando `php artisan serve`;
 * Aparecerá o seguinte log `<http://127.0.0.1:8000>`;
