@@ -34,12 +34,12 @@
         <div class="col-md-12">
           <div class="col-md-3">
             {!!Form::open(['route' => 'create.breed', 'class' => 'form form-search form-ds', 'onsubmit' => 'ShowLoading()', 'method' => 'PUT'])!!}     
-              <button type="submit" id="hidenButton" class="btn btn-block btn-warning btn-lg"><i class="fa fa-download" aria-hidden="true"></i> Baixar Breeds</button>
+              <button type="submit" id="hidenButtonBreeds" class="btn btn-block btn-warning btn-lg"><i class="fa fa-download" aria-hidden="true"></i> Baixar Breeds</button>
             {!!Form::close()!!} 
           </div>
           <div class="col-md-3">
             {!!Form::open(['route' => 'photos.breed', 'class' => 'form form-search form-ds', 'onsubmit' => 'ShowLoading()', 'method' => 'PUT'])!!}     
-              <button type="submit" id="hidenButton" class="btn btn-block btn-danger btn-lg"><i class="fa fa-download" aria-hidden="true"></i> Baixar fotos</button>
+              <button type="submit" id="hidenButtonImgBreeds" class="btn btn-block btn-danger btn-lg"><i class="fa fa-download" aria-hidden="true"></i> Baixar fotos</button>
             {!!Form::close()!!} 
           </div>
           <div class="col-md-3">

@@ -33,7 +33,7 @@
     <!-- daterange picker -->
     <link href="{{ url('/adminlte/bower_components/bootstrap-daterangepicker/daterangepicker.css') }}" rel="stylesheet">
     <!-- DataTables -->
-    <link rel="stylesheet" href="{{ url('/theme/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}" rel="stylesheet">
+    <!--<link rel="stylesheet" href="{{ url('/theme/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}" rel="stylesheet">-->
     <!-- bootstrap datepicker -->
     <link href="{{ url('/adminlte/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
     <!-- iCheck for checkboxes and radio inputs -->
@@ -49,8 +49,28 @@
     <!-- AdminLTE Skins. Choose a skin from the css/skins
          folder instead of downloading all of them to reduce the load. -->
     <link href="{{ url('/adminlte/dist/css/skins/_all-skins.min.css') }}" rel="stylesheet">
-  <!-- Google Font -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <!-- Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <script type="text/javascript">
+      function ShowLoading(e) {
+          document.getElementById('hidenButtonBreeds').setAttribute("disabled","disabled");
+          document.getElementById('hidenButtonImgBreeds').setAttribute("disabled","disabled");
+          var div = document.createElement('div');
+          //var img = document.createElement('img');
+          //var button = document.createElement('button');
+          //img.src = 'http://ladima.tuseon.com.br/images/loading.gif';
+          div.innerHTML = "Aguarde Carregando... <i class='fa fa-spinner fa-pulse fa-0x fa-fw'></i>";
+          div.style.cssText = 'position: fixed; top: 5%; left: 40%; z-index: 5000; padding:10px; color:#fff; text-align: center; background: #3c8dbc; border: 1px solid #fff';
+          //button.style.cssBoton = 'display: none;';
+          //div.appendChild(img);
+          document.body.appendChild(div);
+          //document.body.appendChild(button);
+          return true;
+          // These 2 lines cancel form submission, so only use if needed.
+          window.event.cancelBubble = true;
+          e.stopPropagation();
+      }
+    </script>
   @stack('head')
 </head>
 
@@ -103,7 +123,6 @@
   <!-- FastClick -->
   <script src="{{ url('/adminlte/bower_components/fastclick/lib/fastclick.js') }}" ></script>
   <!-- AdminLTE for demo purposes -->
-  <script src="{{ url('/adminlte/dist/js/demo.js') }}" ></script>   
   <script>
     $(function () {
                 $('#tableRequests').DataTable({
